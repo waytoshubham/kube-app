@@ -1,0 +1,140 @@
+PS D:\Internship Project\kube-app> kubectl apply -f deployment.yaml
+>>
+deployment.apps/myapp-deployment created
+
+
+PS D:\Internship Project\kube-app> kubectl get pods
+>>
+NAME                                READY   STATUS              RESTARTS   AGE
+myapp-deployment-67b5b97c54-7jrj7   0/1     ContainerCreating   0          7s
+myapp-deployment-67b5b97c54-sxqhs   0/1     ContainerCreating   0          7s
+PS D:\Internship Project\kube-app>
+
+
+
+PS D:\Internship Project\kube-app> kubectl apply -f service.yaml   
+>> 
+service/myapp-service created
+
+
+PS D:\Internship Project\kube-app> kubectl get services         
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+kubernetes      ClusterIP   10.96.0.1       <none>        443/TCP        102s
+myapp-service   NodePort    10.103.98.149   <none>        80:30007/TCP   17s
+PS D:\Internship Project\kube-app> 
+
+
+
+
+PS D:\Internship Project\kube-app> kubectl scale deployment myapp-deployment --replicas=4
+deployment.apps/myapp-deployment scaled
+
+
+PS D:\Internship Project\kube-app> kubectl get pods    
+NAME                                READY   STATUS    RESTARTS   AGE
+myapp-deployment-67b5b97c54-4zc8h   1/1     Running   0          13s
+myapp-deployment-67b5b97c54-7jrj7   1/1     Running   0          2m11s
+myapp-deployment-67b5b97c54-fff75   1/1     Running   0          13s
+myapp-deployment-67b5b97c54-sxqhs   1/1     Running   0          2m11s
+PS D:\Internship Project\kube-app>
+
+
+
+PS D:\Internship Project\kube-app> kubectl get pods
+NAME                                READY   STATUS    RESTARTS   AGE
+myapp-deployment-67b5b97c54-4zc8h   1/1     Running   0          77s
+myapp-deployment-67b5b97c54-7jrj7   1/1     Running   0          3m15s
+myapp-deployment-67b5b97c54-fff75   1/1     Running   0          77s
+myapp-deployment-67b5b97c54-sxqhs   1/1     Running   0          3m15s
+
+
+PS D:\Internship Project\kube-app> kubectl describe pod myapp-deployment-67b5b97c54-4zc8h
+Name:             myapp-deployment-67b5b97c54-4zc8h
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.49.2
+Start Time:       Tue, 15 Apr 2025 01:02:37 +0530
+Labels:           app=myapp
+                  pod-template-hash=67b5b97c54
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.7
+IPs:
+  IP:           10.244.0.7
+Controlled By:  ReplicaSet/myapp-deployment-67b5b97c54
+Containers:
+  myapp-container:
+    Container ID:   docker://b6db4cc207498b0dbca7351ee281cd2172300af248c1e3302646e7d91b110d3b
+    Image:          nginx
+    Image ID:       docker-pullable://nginx@sha256:09369da6b10306312cd908661320086bf87fbae1b6b0c49a1f50ba531fef2eab
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Tue, 15 Apr 2025 01:02:44 +0530
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-dl75q (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True
+  Initialized                 True
+  Ready                       True
+  ContainersReady             True
+  PodScheduled                True
+Volumes:
+  kube-api-access-dl75q:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  97s   default-scheduler  Successfully assigned default/myapp-deployment-67b5b97c54-4zc8h to minikube
+  Normal  Pulling    96s   kubelet            Pulling image "nginx"
+  Normal  Pulled     90s   kubelet            Successfully pulled image "nginx" in 2.955s (6.405s including waiting). Image size: 192056179 bytes. 
+  Normal  Created    90s   kubelet            Created container: myapp-container
+  Normal  Started    90s   kubelet            Started container myapp-container
+
+
+
+PS D:\Internship Project\kube-app> kubectl logs myapp-deployment-67b5b97c54-4zc8h
+/docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+/docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+10-listen-on-ipv6-by-default.sh: info: Getting the checksum of /etc/nginx/conf.d/default.conf
+10-listen-on-ipv6-by-default.sh: info: Enabled listen on IPv6 in /etc/nginx/conf.d/default.conf
+/docker-entrypoint.sh: Sourcing /docker-entrypoint.d/15-local-resolvers.envsh
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
+/docker-entrypoint.sh: Configuration complete; ready for start up
+2025/04/14 19:32:44 [notice] 1#1: using the "epoll" event method
+2025/04/14 19:32:44 [notice] 1#1: nginx/1.27.4
+2025/04/14 19:32:44 [notice] 1#1: built by gcc 12.2.0 (Debian 12.2.0-14)
+2025/04/14 19:32:44 [notice] 1#1: OS: Linux 5.15.167.4-microsoft-standard-WSL2
+2025/04/14 19:32:44 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+2025/04/14 19:32:44 [notice] 1#1: start worker processes
+2025/04/14 19:32:44 [notice] 1#1: start worker process 29
+2025/04/14 19:32:44 [notice] 1#1: start worker process 30
+2025/04/14 19:32:44 [notice] 1#1: start worker process 31
+2025/04/14 19:32:44 [notice] 1#1: start worker process 32
+2025/04/14 19:32:44 [notice] 1#1: start worker process 33
+2025/04/14 19:32:44 [notice] 1#1: start worker process 34
+2025/04/14 19:32:44 [notice] 1#1: start worker process 35
+2025/04/14 19:32:44 [notice] 1#1: start worker process 36
+PS D:\Internship Project\kube-app>
+
+
+
+PS D:\Internship Project\kube-app> minikube service myapp-service --url
+>> 
+http://127.0.0.1:56216
+
